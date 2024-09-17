@@ -10,4 +10,4 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/criminal-records', [CriminalRecordController::class, 'index']);
 
-Route::post('/api/search-criminal', [CriminalRecordController::class, 'search']);
+Route::post('/search-criminal', [CriminalRecordController::class, 'search']);

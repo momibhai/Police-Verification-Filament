@@ -17,9 +17,30 @@ class CriminalRecordController extends Controller
     }
 
     public function search(Request $request)
-{
-    return response()->json(['status' => 'API route is working']);
-}
+    {
+        // Validate that either NIC or phone number is provided
+        $request->validate([
+            'query' => 'required|string',
+        ]);
+
+        $query = $request->input('query');
+
+        // Search for criminal by NIC or phone
+        $criminals = CriminalRecord::where('criminal_nic', $query)
+            ->orWhere('criminal_mobile', $query)
+            ->get();
+
+        // If criminals found, return their data
+        if ($criminals->count() > 0) {
+            return response()->json([
+                'found' => true,
+                'data' => $criminals
+            ]);
+        }
+
+        // If no criminal found, return found as false
+        return response()->json(['found' => false]);
+    }
 
     
 

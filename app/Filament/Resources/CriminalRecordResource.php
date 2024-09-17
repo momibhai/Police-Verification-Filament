@@ -10,9 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-
+use Illuminate\Validation\Rule;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 
@@ -29,11 +27,35 @@ class CriminalRecordResource extends Resource
                 TextInput::make('criminal_name')->required()->maxLength(20),
                 TextInput::make('criminal_address')->required()->maxLength(30),
                 DateTimePicker::make('criminal_dob')->required(),
-                TextInput::make('criminal_mobile')->tel()->maxLength(11)->required(),
-                TextInput::make('criminal_nic')->numeric()->maxLength(13)->required(),
+                TextInput::make('criminal_mobile')
+                    ->tel()
+                    ->maxLength(11)
+                    ->required()
+                    // Modify unique validation to ignore the current record during update
+                    ->rule(function ($record) {
+                        return Rule::unique('criminal_records', 'criminal_mobile')->ignore($record);
+                    }),
+                TextInput::make('criminal_nic')
+                    ->numeric()
+                    ->minLength(13)
+                    ->maxLength(13)
+                    ->required()
+                    // Modify unique validation to ignore the current record during update
+                    ->rule(function ($record) {
+                        return Rule::unique('criminal_records', 'criminal_nic')->ignore($record);
+                    }),
                 TextInput::make('father_name')->required()->maxLength(20)->required(),
-                TextInput::make('father_nic')->numeric()->maxLength(13)->required(),
-            ]);
+                TextInput::make('father_nic')
+                    ->numeric()
+                    ->minLength(13)
+                    ->maxLength(13)
+                    ->required()
+                    // Modify unique validation to ignore the current record during update
+                    ->rule(function ($record) {
+                        return Rule::unique('criminal_records', 'father_nic')->ignore($record);
+                    }),
+            ])
+            ->columns(2);
     }
 
     public static function table(Table $table): Table
